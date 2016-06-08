@@ -1,3 +1,14 @@
+.probe-tab-container {
+    border-bottom: 1px solid #ddd;
+    margin: 0 15px 12px 15px;
+    padding: 0;
+    width: calc(100% - 30px); /* 30px = horizontal margins */
+}
+
+#probe-tab-reflow {
+    font-size: 12px;
+}
+
 .scrollable-tabs {
     white-space: nowrap;
 }
@@ -11,6 +22,7 @@
     font-size: 22px;
     font-weight: bold;
     margin-bottom: 4px;
+    padding: 0;
     width: 20px;
 }
 
@@ -20,7 +32,11 @@
     overflow-x: hidden;
     overflow-y: hidden;
     white-space: nowrap;
-    width: calc(100% - 60px); /* 60px = two 20px-wide scroll-action buttons + 20px right margin */
+    width: calc(100% - 45px); /* 45px = two 20px-wide scroll-action buttons + 5px right margin */
+}
+
+.nav-tabs.probe-tabs {
+    border: 0;
 }
 
 .nav-tabs.probe-tabs li {

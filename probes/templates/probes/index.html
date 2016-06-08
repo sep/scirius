@@ -4,6 +4,23 @@
 {% block head %}
 <link rel="stylesheet" type="text/css" href="{% static 'probes/probes.css' %}"/>
 <script type="text/javascript">
+    function areTabsScrollable() {
+        return $('.probe-tab-container').hasClass('scrollable-tabs');
+    }
+
+    function enableDisableTabScrollButtons() {
+        if(!areTabsScrollable()) return;
+
+        var $leftButton = $('a.scroll-action.action-left');
+        var $rightButton = $('a.scroll-action.action-right');
+        var $probeTabs = $('.nav-tabs.probe-tabs');
+
+        $leftButton.prop('disabled', ($probeTabs.scrollLeft() == 0));
+
+        var tabsRight = $probeTabs.position().left + $probeTabs.width();
+        $rightButton.prop('disabled', (tabsRight <= $rightButton.position().left));
+    }
+
     function getTabScrollAmount() {
         return $('.probe-tab-container').width() / 3;
     }
@@ -11,25 +28,47 @@
     function scrollTabsLeft() {
         $('.probe-tabs').animate({scrollLeft: '-=' + getTabScrollAmount()});
         $('a.scroll-action').blur();
+        enableDisableTabScrollButtons();
         return false;
     }
 
     function scrollTabsRight() {
         $('.probe-tabs').animate({scrollLeft: '+=' + getTabScrollAmount()});
         $('a.scroll-action').blur();
+        enableDisableTabScrollButtons();
         return false;
     }
+
+    function reflowProbeTabs() {
+        if(areTabsScrollable()) {
+            $('.probe-tab-container').removeClass('scrollable-tabs');
+            $('#probe-tab-reflow').html('&#8863; Collapse');
+        } else {
+            $('.probe-tab-container').addClass('scrollable-tabs');
+            $('#probe-tab-reflow').html('&#8862; Expand');
+        }
+        return false;
+    }
+
+    $(function() {
+        enableDisableTabScrollButtons();
+    });
 </script>
 {% endblock %}
 
 {% block subnavigation %}
 <div class="row">
+    <div class="col-md-12">
+        <a id="probe-tab-reflow" href="#" onclick="return reflowProbeTabs();">&#8862; Expand</a>
+    </div>
+</div>
+<div class="row">
     <div class="col-md-12 probe-tab-container scrollable-tabs">
-        <a class="btn scroll-action" href="#" onclick="return scrollTabsLeft();">&laquo;</a>
+        <a class="btn scroll-action action-left" href="#" onclick="return scrollTabsLeft();">&laquo;</a>
         <ul class="nav nav-tabs probe-tabs">
             <!-- TODO: probe tabs go here -->
         </ul>
-        <a class="btn scroll-action" href="#" onclick="return scrollTabsRight();">&raquo;</a>
+        <a class="btn scroll-action action-right" href="#" onclick="return scrollTabsRight();">&raquo;</a>
     </div>
 </div>
 {% endblock %}
