@@ -1,0 +1,29 @@
+.scrollable-tabs {
+    white-space: nowrap;
+}
+
+.probe-tab-container .btn.scroll-action {
+    display: none;
+}
+
+.probe-tab-container.scrollable-tabs .btn.scroll-action {
+    display: inline-block;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    width: 20px;
+}
+
+.scrollable-tabs .nav-tabs.probe-tabs {
+    display: inline-block;
+    margin-bottom: -14px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    white-space: nowrap;
+    width: calc(100% - 60px); /* 60px = two 20px-wide scroll-action buttons + 20px right margin */
+}
+
+.nav-tabs.probe-tabs li {
+    display: inline-block;
+    float: none;
+}
