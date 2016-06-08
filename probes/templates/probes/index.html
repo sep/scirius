@@ -1,0 +1,45 @@
+{% extends "rules/base.html" %}
+{% load staticfiles %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'probes/probes.css' %}"/>
+<script type="text/javascript">
+    function getTabScrollAmount() {
+        return $('.probe-tab-container').width() / 3;
+    }
+
+    function scrollTabsLeft() {
+        $('.probe-tabs').animate({scrollLeft: '-=' + getTabScrollAmount()});
+        $('a.scroll-action').blur();
+        return false;
+    }
+
+    function scrollTabsRight() {
+        $('.probe-tabs').animate({scrollLeft: '+=' + getTabScrollAmount()});
+        $('a.scroll-action').blur();
+        return false;
+    }
+</script>
+{% endblock %}
+
+{% block subnavigation %}
+<div class="row">
+    <div class="col-md-12 probe-tab-container scrollable-tabs">
+        <a class="btn scroll-action" href="#" onclick="return scrollTabsLeft();">&laquo;</a>
+        <ul class="nav nav-tabs probe-tabs">
+            <!-- TODO: probe tabs go here -->
+        </ul>
+        <a class="btn scroll-action" href="#" onclick="return scrollTabsRight();">&raquo;</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div>Testing 123</div>
+{% endblock %}
+
+{% block sidebar %}
+<div class="panel-heading">
+<h2 class="panel-title">Suricata</h2>
+</div>
+{% endblock %}
