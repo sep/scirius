@@ -6,7 +6,11 @@
 <script src="{% static 'probes/probes.js' %}"></script>
 <script type="text/javascript">
     $(function() {
-        enable_disable_tab_scroll_buttons();
+        if (read_cookie(probes_tabs_expanded_cookie_name) === '1') {
+            toggle_scrollable_probe_tabs();
+        } else {
+            enable_disable_tab_scroll_buttons();
+        }
     });
 
     $(window).resize(enable_disable_tab_scroll_buttons);
