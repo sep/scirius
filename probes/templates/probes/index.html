@@ -15,10 +15,10 @@
         var $rightButton = $('a.scroll-action.action-right');
         var $probeTabs = $('.nav-tabs.probe-tabs');
 
-        $leftButton.prop('disabled', ($probeTabs.scrollLeft() == 0));
+        var scrollValue = $probeTabs.scrollLeft() / ($probeTabs[0].scrollWidth - $probeTabs.width());
 
-        var tabsRight = $probeTabs.position().left + $probeTabs.width();
-        $rightButton.prop('disabled', (tabsRight <= $rightButton.position().left));
+        $leftButton.toggleClass('disabled', (isNaN(scrollValue) || scrollValue == 0));
+        $rightButton.toggleClass('disabled', (isNaN(scrollValue) || scrollValue == 1));
     }
 
     function getTabScrollAmount() {
@@ -26,16 +26,20 @@
     }
 
     function scrollTabsLeft() {
-        $('.probe-tabs').animate({scrollLeft: '-=' + getTabScrollAmount()});
+        $('.probe-tabs').animate(
+            { scrollLeft: '-=' + getTabScrollAmount() },
+            { always: enableDisableTabScrollButtons }
+        );
         $('a.scroll-action').blur();
-        enableDisableTabScrollButtons();
         return false;
     }
 
     function scrollTabsRight() {
-        $('.probe-tabs').animate({scrollLeft: '+=' + getTabScrollAmount()});
+        $('.probe-tabs').animate(
+            { scrollLeft: '+=' + getTabScrollAmount() },
+            { always: enableDisableTabScrollButtons }
+        );
         $('a.scroll-action').blur();
-        enableDisableTabScrollButtons();
         return false;
     }
 
@@ -53,6 +57,8 @@
     $(function() {
         enableDisableTabScrollButtons();
     });
+
+    $(window).resize(enableDisableTabScrollButtons);
 </script>
 {% endblock %}
 
