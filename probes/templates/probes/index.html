@@ -4,12 +4,12 @@
 {% block head %}
 <link rel="stylesheet" type="text/css" href="{% static 'probes/probes.css' %}"/>
 <script type="text/javascript">
-    function areTabsScrollable() {
+    function are_tabs_scrollable() {
         return $('.probe-tab-container').hasClass('scrollable-tabs');
     }
 
-    function enableDisableTabScrollButtons() {
-        if(!areTabsScrollable()) return;
+    function enable_disable_tab_scroll_buttons() {
+        if(!are_tabs_scrollable()) return;
 
         var $leftButton = $('a.scroll-action.action-left');
         var $rightButton = $('a.scroll-action.action-right');
@@ -21,60 +21,61 @@
         $rightButton.toggleClass('disabled', (isNaN(scrollValue) || scrollValue == 1));
     }
 
-    function getTabScrollAmount() {
+    function get_tab_scroll_amount() {
         return $('.probe-tab-container').width() / 3;
     }
 
-    function scrollTabsLeft() {
+    function scroll_tabs_left() {
         $('.probe-tabs').animate(
-            { scrollLeft: '-=' + getTabScrollAmount() },
-            { always: enableDisableTabScrollButtons }
+            { scrollLeft: '-=' + get_tab_scroll_amount() },
+            { always: enable_disable_tab_scroll_buttons }
         );
         $('a.scroll-action').blur();
         return false;
     }
 
-    function scrollTabsRight() {
+    function scroll_tabs_right() {
         $('.probe-tabs').animate(
-            { scrollLeft: '+=' + getTabScrollAmount() },
-            { always: enableDisableTabScrollButtons }
+            { scrollLeft: '+=' + get_tab_scroll_amount() },
+            { always: enable_disable_tab_scroll_buttons }
         );
         $('a.scroll-action').blur();
         return false;
     }
 
-    function reflowProbeTabs() {
-        if(areTabsScrollable()) {
+    function toggle_scrollable_probe_tabs() {
+        if(are_tabs_scrollable()) {
             $('.probe-tab-container').removeClass('scrollable-tabs');
-            $('#probe-tab-reflow').html('&#8863; Collapse');
+            $('#probe-tab-style-toggle').html('&#8863; Collapse');
         } else {
             $('.probe-tab-container').addClass('scrollable-tabs');
-            $('#probe-tab-reflow').html('&#8862; Expand');
+            $('#probe-tab-style-toggle').html('&#8862; Expand');
+            enable_disable_tab_scroll_buttons();
         }
         return false;
     }
 
     $(function() {
-        enableDisableTabScrollButtons();
+        enable_disable_tab_scroll_buttons();
     });
 
-    $(window).resize(enableDisableTabScrollButtons);
+    $(window).resize(enable_disable_tab_scroll_buttons);
 </script>
 {% endblock %}
 
 {% block subnavigation %}
 <div class="row">
     <div class="col-md-12">
-        <a id="probe-tab-reflow" href="#" onclick="return reflowProbeTabs();">&#8862; Expand</a>
+        <a id="probe-tab-style-toggle" class="btn" onclick="return toggle_scrollable_probe_tabs();">&#8862; Expand</a>
     </div>
 </div>
 <div class="row">
     <div class="col-md-12 probe-tab-container scrollable-tabs">
-        <a class="btn scroll-action action-left" href="#" onclick="return scrollTabsLeft();">&laquo;</a>
+        <a class="btn scroll-action action-left" onclick="return scroll_tabs_left();">&laquo;</a>
         <ul class="nav nav-tabs probe-tabs">
             <!-- TODO: probe tabs go here -->
         </ul>
-        <a class="btn scroll-action action-right" href="#" onclick="return scrollTabsRight();">&raquo;</a>
+        <a class="btn scroll-action action-right" onclick="return scroll_tabs_right();">&raquo;</a>
     </div>
 </div>
 {% endblock %}

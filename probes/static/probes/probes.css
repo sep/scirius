@@ -5,8 +5,9 @@
     width: calc(100% - 30px); /* 30px = horizontal margins */
 }
 
-#probe-tab-reflow {
+#probe-tab-style-toggle {
     font-size: 12px;
+    padding: 4px;
 }
 
 .scrollable-tabs {
