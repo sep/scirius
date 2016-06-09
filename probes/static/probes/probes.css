@@ -2,12 +2,8 @@
     border-bottom: 1px solid #ddd;
     margin: 0 15px 12px 15px;
     padding: 0;
+    position: relative;
     width: calc(100% - 30px); /* 30px = horizontal margins */
-}
-
-#probe-tab-style-toggle {
-    font-size: 12px;
-    padding: 4px;
 }
 
 .scrollable-tabs {
@@ -18,7 +14,7 @@
     display: none;
 }
 
-.probe-tab-container.scrollable-tabs .btn.scroll-action {
+.probe-tab-container.scrollable-tabs .btn.scroll-action, #probe-tab-style-toggle {
     display: inline-block;
     font-size: 22px;
     font-weight: bold;
@@ -27,13 +23,19 @@
     width: 20px;
 }
 
+#probe-tab-style-toggle {
+    position: absolute;
+    top: 4px;
+    right: 0;
+}
+
 .scrollable-tabs .nav-tabs.probe-tabs {
     display: inline-block;
     margin-bottom: -14px;
     overflow-x: hidden;
     overflow-y: hidden;
     white-space: nowrap;
-    width: calc(100% - 45px); /* 45px = two 20px-wide scroll-action buttons + 5px right margin */
+    width: calc(100% - 75px); /* 75px = two 20px-wide scroll-action buttons + 20px-wide expand/collapse button + 15px right margin */
 }
 
 .nav-tabs.probe-tabs {
