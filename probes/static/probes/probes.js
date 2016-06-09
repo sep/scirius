@@ -69,10 +69,10 @@ function scroll_tabs_right() {
 function toggle_scrollable_probe_tabs() {
     if(are_tabs_scrollable()) {
         $('.probe-tab-container').removeClass('scrollable-tabs');
-        $('#probe-tab-style-toggle').html('&#8863; Collapse');
+        $('#probe-tab-style-toggle').html('&#9650;');
     } else {
         $('.probe-tab-container').addClass('scrollable-tabs');
-        $('#probe-tab-style-toggle').html('&#8862; Expand');
+        $('#probe-tab-style-toggle').html('&#9660;');
         enable_disable_tab_scroll_buttons();
     }
     create_cookie(probes_tabs_expanded_cookie_name, are_tabs_scrollable() ? 0 : 1);

@@ -19,23 +19,19 @@
 
 {% block subnavigation %}
 <div class="row">
-    <div class="col-md-12">
-        <a id="probe-tab-style-toggle" class="btn" onclick="return toggle_scrollable_probe_tabs();">&#8862; Expand</a>
-    </div>
-</div>
-<div class="row">
     <div class="col-md-12 probe-tab-container scrollable-tabs">
         <a class="btn scroll-action action-left" onclick="return scroll_tabs_left();">&laquo;</a>
+        <a class="btn scroll-action action-right" onclick="return scroll_tabs_right();">&raquo;</a>
         <ul class="nav nav-tabs probe-tabs">
             <!-- TODO: probe tabs go here -->
         </ul>
-        <a class="btn scroll-action action-right" onclick="return scroll_tabs_right();">&raquo;</a>
+        <a id="probe-tab-style-toggle" class="btn" onclick="return toggle_scrollable_probe_tabs();">&#9660</a>
     </div>
 </div>
 {% endblock %}
 
 {% block content %}
-<div>Testing 123</div>
+<div>Probe info goes here</div>
 {% endblock %}
 
 {% block sidebar %}
