@@ -1,0 +1,18 @@
+{% extends "rules/base.html" %}
+{% block sidebar %}
+<div class="panel-heading">
+<h2 class="panel-title">Delete object</h2>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<h2 class="title">Are you sure you want to delete Probe {{ object.hostname|default:object.pk }}?</h2>
+
+<form class="form" action={% url delfn object.id %} method="post">{% csrf_token %}
+<button class="btn btn-primary" type="submit">
+<span class="glyphicon glyphicon-trash"> Delete object</span>
+</button>
+</form>
+
+{% endblock %}
