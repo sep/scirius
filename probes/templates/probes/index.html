@@ -1,41 +1,6 @@
-{% extends "rules/base.html" %}
+{% extends "probes/probes_base.html" %}
 {% load staticfiles %}
 
-{% block head %}
-<link rel="stylesheet" type="text/css" href="{% static 'probes/probes.css' %}"/>
-<script src="{% static 'probes/probes.js' %}"></script>
-<script type="text/javascript">
-    $(function() {
-        if (read_cookie(probes_tabs_expanded_cookie_name) === '1') {
-            toggle_scrollable_probe_tabs();
-        } else {
-            enable_disable_tab_scroll_buttons();
-        }
-    });
-
-    $(window).resize(enable_disable_tab_scroll_buttons);
-</script>
-{% endblock %}
-
-{% block subnavigation %}
-<div class="row">
-    <div class="col-md-12 probe-tab-container scrollable-tabs">
-        <a class="btn scroll-action action-left" onclick="return scroll_tabs_left();">&laquo;</a>
-        <a class="btn scroll-action action-right" onclick="return scroll_tabs_right();">&raquo;</a>
-        <ul class="nav nav-tabs probe-tabs">
-            <!-- TODO: probe tabs go here -->
-        </ul>
-        <a id="probe-tab-style-toggle" class="btn" onclick="return toggle_scrollable_probe_tabs();">&#9660</a>
-    </div>
-</div>
-{% endblock %}
-
-{% block content %}
-<div>Probe info goes here</div>
-{% endblock %}
-
-{% block sidebar %}
-<div class="panel-heading">
-<h2 class="panel-title">Suricata</h2>
-</div>
+{% block probecontent %}
+<p>You currently have {{ probes|length }} probe{{ probes|length|pluralize }} defined.</p>
 {% endblock %}

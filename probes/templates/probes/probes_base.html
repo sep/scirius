@@ -1,0 +1,105 @@
+{% extends "rules/base.html" %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'probes/probes.css' %}"/>
+<script src="{% static 'probes/probes.js' %}"></script>
+<script type="text/javascript">
+    $(function() {
+        if (read_cookie(probes_tabs_expanded_cookie_name) === '1') {
+            toggle_scrollable_probe_tabs();
+        } else {
+            enable_disable_tab_scroll_buttons();
+        }
+    });
+
+    $(window).resize(enable_disable_tab_scroll_buttons);
+</script>
+{% endblock %}
+
+{% block subnavigation %}
+<div class="row" {% if probes|length == 0 %} style="display: none" {% endif %}>
+    <div class="col-md-12 probe-tab-container scrollable-tabs">
+        <a class="btn scroll-action action-left" onclick="return scroll_tabs_left();">&laquo;</a>
+        <a class="btn scroll-action action-right" onclick="return scroll_tabs_right();">&raquo;</a>
+        <ul class="nav nav-tabs probe-tabs">
+            {% for probe in probes %}
+                <li {% if current_id == probe.id %} class="active" {% endif %}>
+                    <a href="{% url 'probes_probe' probe.id %}">
+                        {{ probe.hostname }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+        <a id="probe-tab-style-toggle" class="btn" onclick="return toggle_scrollable_probe_tabs();">&#9660</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<a class="btn btn-primary" data-toggle="modal" data-target="#addProbeModal">
+    <span class="glyphicon glyphicon-plus"></span>
+    Add probe
+</a>
+{% endblock %}
+
+{% block error %}
+{% if error %}
+<div class="alert alert-danger alert-dismissible">
+    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span
+            class="sr-only">Close</span></button>
+    <span>{{ error_heading }}</span>
+    <span id="error">{{ error }}</span>
+</div>
+{% else %}
+<div class="alert alert-danger alert-dismissible" style="display:none;">
+    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span
+            class="sr-only">Close</span></button>
+
+    <span id="error">No error</span></div>
+{% endif %}
+{% if success %}
+<div class="alert alert-success alert-dismissible">
+    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span
+            class="sr-only">Close</span></button>
+    <span id="error">{{ success }}</span></div>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="modal fade" id="addProbeModal" tabindex="-1" role="dialog" aria-labelledby="addProbeModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="addProbeModalLabel">Add probe</h4>
+            </div>
+            <form action="{% url 'probes_add' %}" method="post">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    {% bootstrap_form addProbeForm %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert {{ message.extra_tags }} alert-dismissible">
+    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span
+            class="sr-only">Close</span></button>
+    <span>{{ message }}</span>
+</div>
+{% endfor %}
+{% endif %}
+
+{% block probecontent %} {% endblock %}
+
+{% endblock %}

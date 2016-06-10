@@ -15,12 +15,10 @@ You should have received a copy of the GNU General Public License
 along with Scirius.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from django.conf.urls import patterns, url
+from django.forms import ModelForm
+from probes.models import Probes
 
-from probes import views
-
-urlpatterns = patterns('',
-    url(r'^$', views.index, name='probes_index'),
-    url(r'^(?P<probe_id>\d+)/$', views.probe, name='probes_probe'),
-    url(r'^add$', views.add_probe, name='probes_add'),
-    )
+class ProbeForm(ModelForm):
+    class Meta:
+        model = Probes
+        exclude = ('created_date', 'updated_date')

@@ -1,0 +1,41 @@
+{% extends "probes/probes_base.html" %}
+{% load staticfiles %}
+
+{% block probecontent %}
+TODO
+{% endblock %}
+
+{% block sidebar %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h2 class="panel-title">Probe {{ probe.hostname }}</h2>
+        <p class="panel-subtitle">{{ probe.description }}</p>
+    </div>
+    <div class="panel-body">
+        <p>Created on {{ probe.created_date }}</p>
+        <p>Last modified on {{ probe.updated_date }}</p>
+        <a class="btn btn-default" data-toggle="modal" data-target="#editProbeModal">
+            <span class="glyphicon glyphicon-pencil"></span>
+            Edit probe
+        </a>
+        <hr />
+        <a class="btn btn-success">
+            <span class="glyphicon glyphicon-refresh"></span>
+            Update sources
+        </a>
+        <a class="btn btn-info">
+            <span class="glyphicon glyphicon-floppy-disk"></span>
+            Build rules
+        </a>
+        <a class="btn btn-danger">
+            <span class="glyphicon glyphicon-trash"></span>
+            Delete probe
+        </a>
+    </div>
+</div>
+
+<a class="btn btn-primary" data-toggle="modal" data-target="#addProbeModal">
+    <span class="glyphicon glyphicon-plus"></span>
+    Add probe
+</a>
+{% endblock %}
