@@ -43,10 +43,13 @@ def get_context(request):
         'messages': process_messages(get_messages(request))
     }
 
-def index(request):
-    return scirius_render(request, 'probes/index.html', get_context(request))
+def index(request, error = None, error_heading = None):
+    context = get_context(request)
+    context['error'] = error
+    context['error_heading'] = error_heading
+    return scirius_render(request, 'probes/index.html', context)
 
-def probe(request, probe_id):
+def probe(request, probe_id, error = None, error_heading = None):
     context = get_context(request)
     context['current_id'] = int(probe_id)
 
@@ -57,6 +60,9 @@ def probe(request, probe_id):
         return redirect(index)
 
     context['probe'] = probe
+    context['editProbeForm'] = ProbeForm(instance = probe)
+    context['error'] = error
+    context['error_heading'] = error_heading
 
     return scirius_render(request, 'probes/probe.html', context)
 
@@ -70,6 +76,25 @@ def delete_probe(request, probe_id):
         messages.error(request, 'The selected probe was not found.')
 
     return redirect(index)
+
+def edit_probe(request, probe_id):
+    if request.method != 'POST':
+        return redirect(index)
+
+    try:
+        probe_object = Probes.objects.get(id = probe_id)
+    except Probes.DoesNotExist:
+        messages.error(request, 'The selected probe was not found.')
+        return redirect(index)
+
+    form = ProbeForm(request.POST, instance = probe_object)
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'Update succeeded.')
+    else:
+        return probe(request, probe_id, form.errors, 'This probe could not be modified because of the following errors:')
+
+    return redirect('probes_probe', probe_id = probe_id)
 
 def add_probe(request):
     if request.method != 'POST':
@@ -88,11 +113,6 @@ def add_probe(request):
                                                )
             return redirect('probes_probe', probe_id = probeObject.id)
         except IntegrityError, error:
-            context = get_context(request)
-            context['error'] = error
-            return scirius_render(request, 'probes/index.html', context)
+            return index(request, error)
     else:
-        context = get_context(request)
-        context['error'] = form.errors
-        context['error_heading'] = 'The probe could not be added because of the following errors:'
-        return scirius_render(request, 'probes/index.html', context)
+        return index(request, form.errors, 'The probe could not be added because of the following errors:')

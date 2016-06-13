@@ -22,6 +22,7 @@ from probes import views
 urlpatterns = patterns('',
     url(r'^$', views.index, name='probes_index'),
     url(r'^(?P<probe_id>\d+)/$', views.probe, name='probes_probe'),
+    url(r'^(?P<probe_id>\d+)/edit$', views.edit_probe, name='probes_edit'),
     url(r'^(?P<probe_id>\d+)/delete$', views.delete_probe, name='probes_delete'),
     url(r'^add$', views.add_probe, name='probes_add'),
     )
