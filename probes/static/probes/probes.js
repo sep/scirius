@@ -78,3 +78,16 @@ function toggle_scrollable_probe_tabs() {
     create_cookie(probes_tabs_expanded_cookie_name, are_tabs_scrollable() ? 0 : 1);
     return false;
 }
+
+function scroll_to_current_tab() {
+    if(!are_tabs_scrollable() || $('.probe-tabs li.active').length == 0) return;
+
+    var containerWidth = $('.probe-tab-container').width();
+    var targetPosition = $('.probe-tabs li.active').position().left
+        + $('.probe-tabs li.active').width() - containerWidth / 2;
+
+    if(targetPosition > containerWidth) {
+        $('.probe-tabs').scrollLeft(targetPosition);
+        enable_disable_tab_scroll_buttons();
+    }
+}
