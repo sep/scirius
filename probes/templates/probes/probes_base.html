@@ -5,6 +5,7 @@
 {% block head %}
 <link rel="stylesheet" type="text/css" href="{% static 'probes/probes.css' %}"/>
 <script src="{% static 'probes/probes.js' %}"></script>
+<script src="{% static 'probes/modals.js' %}"></script>
 <script type="text/javascript">
     $(function() {
         if (read_cookie(probes_tabs_expanded_cookie_name) === '1') {
@@ -86,6 +87,23 @@
                     <button type="submit" class="btn btn-primary">Add</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="confirmationModalLabel"></h4>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default cancel-button" data-dismiss="modal"></button>
+                <button type="button" class="btn btn-danger proceed-button"></button>
+            </div>
         </div>
     </div>
 </div>

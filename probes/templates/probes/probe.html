@@ -6,10 +6,24 @@ TODO
 {% endblock %}
 
 {% block sidebar %}
+<script type="text/javascript">
+    function deleteProbe() {
+        $('#deleteProbeForm').submit();
+    }
+
+    function confirmProbeDelete() {
+        showConfirmationDialog('Delete probe {{ probe.hostname|escape }}?',
+            'Are you sure you want to delete this probe? This action cannot be undone.',
+            'Delete',
+            'Cancel',
+            deleteProbe);
+    }
+</script>
+
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h2 class="panel-title">Probe {{ probe.hostname }}</h2>
-        <p class="panel-subtitle">{{ probe.description }}</p>
+        <h2 class="panel-title">Probe {{ probe.hostname|escape }}</h2>
+        <p class="panel-subtitle">{{ probe.description|escape }}</p>
     </div>
     <div class="panel-body">
         <p>Created on {{ probe.created_date }}</p>
@@ -27,10 +41,13 @@ TODO
             <span class="glyphicon glyphicon-floppy-disk"></span>
             Build rules
         </a>
-        <a class="btn btn-danger">
+        <a class="btn btn-danger" onclick="confirmProbeDelete(); return false;">
             <span class="glyphicon glyphicon-trash"></span>
             Delete probe
         </a>
+        <form action="{% url 'probes_delete' probe.id %}" method="post" id="deleteProbeForm">
+            {% csrf_token %}
+        </form>
     </div>
 </div>
 

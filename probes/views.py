@@ -60,9 +60,20 @@ def probe(request, probe_id):
 
     return scirius_render(request, 'probes/probe.html', context)
 
+def delete_probe(request, probe_id):
+    if request.method != 'POST':
+        return redirect(index)
+
+    try:
+        Probes.objects.get(id = probe_id).delete()
+    except Probes.DoesNotExist:
+        messages.error(request, 'The selected probe was not found.')
+
+    return redirect(index)
+
 def add_probe(request):
     if request.method != 'POST':
-        redirect(index)
+        return redirect(index)
 
     form = ProbeForm(request.POST)
     if form.is_valid():
