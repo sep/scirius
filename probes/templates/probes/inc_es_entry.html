@@ -1,0 +1,58 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="title">{{ entry_title }} (last {{ date }})
+                <div class="pull-right">
+                    <a class="dropdown-toggle" type="button" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-cog"> </span>
+                    </a>
+                    <ul class="dropdown-menu">
+                    {% if entry_special %}
+                        <li role="presentation" class="dropdown-header">Time Filter</li>
+                        <li><a href="?duration=1">Last 1h</a></li>
+                        <li><a href="?duration=6">Last 6h</a></li>
+                        <li><a href="?duration=24">Last 24h</a></li>
+                        <li><a href="?duration=48">Last 2d</a></li>
+                        <li><a href="?duration=168">Last 7d</a></li>
+                        <li role="presentation" class="dropdown-header">Graph type</li>
+                        <li><a href="?graph=sunburst">Sunburst</a></li>
+                        <li><a href="?graph=circles">Circles</a></li>
+                    {% else %}
+                        <li><a href="?duration=1">Last 1h</a></li>
+                        <li><a href="?duration=6">Last 6h</a></li>
+                        <li><a href="?duration=24">Last 24h</a></li>
+                        <li><a href="?duration=48">Last 2d</a></li>
+                        <li><a href="?duration=168">Last 7d</a></li>
+                    {% endif %}
+                    </ul>
+                </div>
+            </h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div id="{{ entry_id }}">
+                {% if entry_special %}
+                <p>Fetching data...</p>
+                {% else %}
+                <span>Fetching data...</span>
+                {% endif %}
+
+                {% if not entry_skip_svg %}
+                <svg style="width:100%;height:300px">
+                </svg>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+    {% if entry_extra_id %}
+    <div class="row">
+        <div class="col-md-12">
+            <div id="{{ entry_extra_id }}"></div>
+        </div>
+    </div>
+    {% endif %}
+</div>

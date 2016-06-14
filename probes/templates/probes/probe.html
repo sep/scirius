@@ -3,7 +3,13 @@
 {% load bootstrap3 %}
 
 {% block probecontent %}
-TODO
+
+{% if elasticsearch %}
+{% include "probes/inc_elasticsearch.html" %}
+{% else %}
+<p>Elasticsearch is disabled.</p>
+{% endif %}
+
 <div class="modal fade" id="editProbeModal" tabindex="-1" role="dialog" aria-labelledby="editProbeModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -76,8 +82,11 @@ TODO
     </div>
 </div>
 
+{% if request.user.is_staff %}
 <a class="btn btn-primary" data-toggle="modal" data-target="#addProbeModal">
     <span class="glyphicon glyphicon-plus"></span>
     Add probe
 </a>
+{% endif %}
+
 {% endblock %}
