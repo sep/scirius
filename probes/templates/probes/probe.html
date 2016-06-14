@@ -50,6 +50,8 @@ TODO
     <div class="panel-body">
         <p>Created on {{ probe.created_date }}</p>
         <p>Last modified on {{ probe.updated_date }}</p>
+
+        {% if request.user.is_staff %}
         <a class="btn btn-default" data-toggle="modal" data-target="#editProbeModal">
             <span class="glyphicon glyphicon-pencil"></span>
             Edit probe
@@ -70,6 +72,7 @@ TODO
         <form action="{% url 'probes_delete' probe.id %}" method="post" id="deleteProbeForm">
             {% csrf_token %}
         </form>
+        {% endif %}
     </div>
 </div>
 

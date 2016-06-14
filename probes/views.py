@@ -15,6 +15,7 @@ You should have received a copy of the GNU General Public License
 along with Scirius.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.messages import get_messages
 from django.db import IntegrityError
@@ -23,6 +24,7 @@ from django.utils import timezone
 from scirius.utils import scirius_render
 from probes.models import Probes
 from probes.forms import ProbeForm
+from rules.views import complete_context
 
 def process_messages(values):
     for message in values:
@@ -64,10 +66,14 @@ def probe(request, probe_id, error = None, error_heading = None):
     context['error'] = error
     context['error_heading'] = error_heading
 
+    if settings.USE_ELASTICSEARCH:
+        context['rules'] = True
+        complete_context(request, context)
+
     return scirius_render(request, 'probes/probe.html', context)
 
 def delete_probe(request, probe_id):
-    if request.method != 'POST':
+    if request.method != 'POST' or not request.user.is_staff:
         return redirect(index)
 
     try:
@@ -78,7 +84,7 @@ def delete_probe(request, probe_id):
     return redirect(index)
 
 def edit_probe(request, probe_id):
-    if request.method != 'POST':
+    if request.method != 'POST' or not request.user.is_staff:
         return redirect(index)
 
     try:
@@ -90,14 +96,14 @@ def edit_probe(request, probe_id):
     form = ProbeForm(request.POST, instance = probe_object)
     if form.is_valid():
         form.save()
-        messages.success(request, 'Update succeeded.')
+        messages.success(request, 'Your probe changes have been saved.')
     else:
         return probe(request, probe_id, form.errors, 'This probe could not be modified because of the following errors:')
 
     return redirect('probes_probe', probe_id = probe_id)
 
 def add_probe(request):
-    if request.method != 'POST':
+    if request.method != 'POST' or not request.user.is_staff:
         return redirect(index)
 
     form = ProbeForm(request.POST)

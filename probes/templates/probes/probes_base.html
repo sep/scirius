@@ -40,10 +40,12 @@
 {% endblock %}
 
 {% block sidebar %}
+{% if request.user.is_staff %}
 <a class="btn btn-primary" data-toggle="modal" data-target="#addProbeModal">
     <span class="glyphicon glyphicon-plus"></span>
     Add probe
 </a>
+{% endif %}
 {% endblock %}
 
 {% block error %}
