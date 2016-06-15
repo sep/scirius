@@ -95,49 +95,59 @@
 </div>
 
 <script type="text/javascript">
-$( 'document' ).ready(function () { draw_timeline({{ from_date }}, [ '{{ probe.hostname }}'], null); });
+function differentiate_suppressed() {
+    var arr = [{{ suppressed }}];
+    $(".sid").each(function() {
+        if (jQuery.inArray(parseInt($( this ).text(), 10), arr) != -1)
+            $( this ).addClass("suppressed")
+    })
+}
 
-$( 'document' ).ready(load_rules({{ from_date }},  [ '{{ probe.hostname }}'], null));
+$(function () {
+    draw_timeline({{ from_date }}, [ '{{ probe.hostname }}'], null);
+    load_rules({{ from_date }},  [ '{{ probe.hostname }}'], null);
 
-$( 'document' ).ready(function () {
-        {{ draw_func }}({{ from_date }}, [{% autoescape off %} "{{ probe.hostname }}" {% endautoescape %}], null,
-          function() {
-            $('{{ draw_elt }}').mouseover(function(){
-                var d = this.__data__;
-                if (d.children == undefined) {
-                    $( "#rules_table a:contains('" +d.key +"')" ).parent().parent().addClass('overed');
-                }
-            });
-            $('{{ draw_elt }}').mouseout(function(){
-                var d = this.__data__;
-                if (d.children == undefined) {
-                    $( "#rules_table a:contains('" +d.key +"')" ).parent().parent().removeClass('overed');
-                }
-            });
-          }
-        );
+    {{ draw_func }}({{ from_date }}, [{% autoescape off %} "{{ probe.hostname }}" {% endautoescape %}], null,
+      function() {
+        $('{{ draw_elt }}').mouseover(function(){
+            var d = this.__data__;
+            if (d.children == undefined) {
+                $( "#rules_table a:contains('" + d.key + "')" ).parent().parent().addClass('overed');
+            }
+        });
+        $('{{ draw_elt }}').mouseout(function(){
+            var d = this.__data__;
+            if (d.children == undefined) {
+                $( "#rules_table a:contains('" + d.key + "')" ).parent().parent().removeClass('overed');
+            }
+        });
+      }
+    );
+
+    differentiate_suppressed();
 });
-
 
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
     if (String(e.target).match('#stats')) {
-        draw_stats_timeline({{ from_date }}, 'stats.capture.kernel_packets', '#suri_packet', 1, [ '{{ probe.hostname }}']);
-        draw_stats_timeline({{ from_date }}, 'stats.capture.kernel_drops', '#suri_drop', 1, [ '{{ probe.hostname }}']);
+        draw_stats_timeline({{ from_date }}, 'stats.capture.kernel_packets', '#suri_packet', 1, [ '{{ probe.hostname }}' ]);
+        draw_stats_timeline({{ from_date }}, 'stats.capture.kernel_drops', '#suri_drop', 1, [ '{{ probe.hostname }}' ]);
     }
     if (String(e.target).match('#rules')) {
         draw_timeline({{ from_date }}, [ '{{ probe.hostname }}'], null);
     }
     if (String(e.target).match('#indicators')) {
-        draw_stats_timeline({{ from_date }}, 'stats.flow.emerg_mode_entered', '#flow_emergency', 0, [ '{{ probe.hostname }}']);
-        draw_stats_timeline({{ from_date }}, 'stats.tcp.reassembly_gap', '#tcp_gaps', 0, [ '{{ probe.hostname }}']);
-        draw_stats_timeline({{ from_date }}, 'stats.decoder.invalid', '#decoder_invalid', 0, [ '{{ probe.hostname }}']);
+        draw_stats_timeline({{ from_date }}, 'stats.flow.emerg_mode_entered', '#flow_emergency', 0, [ '{{ probe.hostname }} ']);
+        draw_stats_timeline({{ from_date }}, 'stats.tcp.reassembly_gap', '#tcp_gaps', 0, [ '{{ probe.hostname }}' ]);
+        draw_stats_timeline({{ from_date }}, 'stats.decoder.invalid', '#decoder_invalid', 0, [ '{{ probe.hostname }}' ]);
     }
     if (String(e.target).match('#memory')) {
-        draw_stats_timeline({{ from_date }}, 'stats.flow.memuse', '#flow_memuse', 0, [ '{{ probe.hostname }}']);
-        draw_stats_timeline({{ from_date }}, 'stats.tcp.memuse', '#tcp_memuse', 0, [ '{{ probe.hostname }}'] );
-        draw_stats_timeline({{ from_date }}, 'stats.tcp.reassembly_memuse', '#tcp_reassembly_memuse', 0, [ '{{ probe.hostname }}'] );
-        draw_stats_timeline({{ from_date }}, 'stats.http.memuse', '#http_memuse', 0, [ '{{ probe.hostname }}']);
-        draw_stats_timeline({{ from_date }}, 'stats.dns.memuse', '#dns_memuse', 0, [ '{{ probe.hostname }}']);
+        draw_stats_timeline({{ from_date }}, 'stats.flow.memuse', '#flow_memuse', 0, [ '{{ probe.hostname }}' ]);
+        draw_stats_timeline({{ from_date }}, 'stats.tcp.memuse', '#tcp_memuse', 0, [ '{{ probe.hostname }}' ]);
+        draw_stats_timeline({{ from_date }}, 'stats.tcp.reassembly_memuse', '#tcp_reassembly_memuse', 0, [ '{{ probe.hostname }}' ]);
+        draw_stats_timeline({{ from_date }}, 'stats.http.memuse', '#http_memuse', 0, [ '{{ probe.hostname }}' ]);
+        draw_stats_timeline({{ from_date }}, 'stats.dns.memuse', '#dns_memuse', 0, [ '{{ probe.hostname }}' ]);
     }
+
+    e.target.blur();
 });
 </script>

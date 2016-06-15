@@ -66,6 +66,12 @@ def probe(request, probe_id, error = None, error_heading = None):
     context['error'] = error
     context['error_heading'] = error_heading
 
+    if probe.ruleset:
+        supp_rules = list(probe.ruleset.suppressed_rules.all())
+        if len(supp_rules):
+            suppressed = ",".join([str(x.sid) for x in supp_rules])
+            context['suppressed'] = suppressed
+
     if settings.USE_ELASTICSEARCH:
         context['rules'] = True
         complete_context(request, context)
