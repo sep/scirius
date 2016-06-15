@@ -20,6 +20,7 @@ from django.contrib import messages
 from django.contrib.messages import get_messages
 from django.db import IntegrityError
 from django.shortcuts import redirect
+from django.utils import formats
 from django.utils import timezone
 from scirius.utils import scirius_render
 from probes.models import Probes
@@ -145,5 +146,5 @@ def update_ruleset(request, probe_id):
         return probe_index(request, probe_id, errors,
                      'The current ruleset could not be updated because of the following errors:')
 
-    messages.success(request, 'The current ruleset was updated at %s.' % probe.ruleset.updated_date)
+    messages.success(request, 'The current ruleset was updated {}'.format(formats.date_format(probe.ruleset.updated_date, "DATETIME_FORMAT")))
     return redirect('probes_probe', probe_id=probe_id)
