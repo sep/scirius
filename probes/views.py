@@ -51,7 +51,7 @@ def index(request, error = None, error_heading = None):
     context['error_heading'] = error_heading
     return scirius_render(request, 'probes/index.html', context)
 
-def probe(request, probe_id, error = None, error_heading = None):
+def probe_index(request, probe_id, error = None, error_heading = None):
     context = get_context(request)
     context['current_id'] = int(probe_id)
 
@@ -94,17 +94,17 @@ def edit_probe(request, probe_id):
         return redirect(index)
 
     try:
-        probe_object = Probes.objects.get(id = probe_id)
+        probe = Probes.objects.get(id = probe_id)
     except Probes.DoesNotExist:
         messages.error(request, 'The selected probe was not found.')
         return redirect(index)
 
-    form = ProbeForm(request.POST, instance = probe_object)
+    form = ProbeForm(request.POST, instance = probe)
     if form.is_valid():
         form.save()
         messages.success(request, 'Your probe changes have been saved.')
     else:
-        return probe(request, probe_id, form.errors, 'This probe could not be modified because of the following errors:')
+        return probe_index(request, probe_id, form.errors, 'This probe could not be modified because of the following errors:')
 
     return redirect('probes_probe', probe_id = probe_id)
 
@@ -115,7 +115,7 @@ def add_probe(request):
     form = ProbeForm(request.POST)
     if form.is_valid():
         try:
-            probeObject = Probes.objects.create(hostname = form.cleaned_data['hostname'],
+            probe = Probes.objects.create(hostname = form.cleaned_data['hostname'],
                                                 description = form.cleaned_data['description'],
                                                 output_directory = form.cleaned_data['output_directory'],
                                                 created_date = timezone.now(),
@@ -123,8 +123,27 @@ def add_probe(request):
                                                 ruleset = form.cleaned_data['ruleset'],
                                                 yaml_file = form.cleaned_data['yaml_file'],
                                                )
-            return redirect('probes_probe', probe_id = probeObject.id)
+            return redirect('probes_probe', probe_id = probe.id)
         except IntegrityError, error:
             return index(request, error)
     else:
         return index(request, form.errors, 'The probe could not be added because of the following errors:')
+
+def update_ruleset(request, probe_id):
+    if request.method != 'POST' or not request.user.is_staff:
+        return redirect(index)
+
+    try:
+        probe = Probes.objects.get(id = probe_id)
+    except Probes.DoesNotExist:
+        messages.error(request, 'The selected probe could not be loaded.')
+        return redirect(index)
+
+    try:
+        probe.ruleset.update()
+    except IOError, errors:
+        return probe_index(request, probe_id, errors,
+                     'The current ruleset could not be updated because of the following errors:')
+
+    messages.success(request, 'The current ruleset was updated at %s.' % probe.ruleset.updated_date)
+    return redirect('probes_probe', probe_id=probe_id)
