@@ -142,9 +142,9 @@ def update_ruleset(request, probe_id):
 
     try:
         probe.ruleset.update()
+        messages.success(request, 'The current ruleset was updated {}'.format(
+            formats.date_format(probe.ruleset.updated_date, "DATETIME_FORMAT")))
     except IOError, errors:
-        return probe_index(request, probe_id, errors,
-                     'The current ruleset could not be updated because of the following errors:')
+        messages.error(request, 'The current ruleset could not be updated: %s' % errors)
 
-    messages.success(request, 'The current ruleset was updated {}'.format(formats.date_format(probe.ruleset.updated_date, "DATETIME_FORMAT")))
     return redirect('probes_probe', probe_id=probe_id)
