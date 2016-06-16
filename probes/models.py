@@ -31,7 +31,8 @@ def validate_hostname(value):
         raise ValidationError('"%s" cannot contain spaces' % value)
 
 class Probes(models.Model):
-    hostname = models.CharField(max_length=100, unique = True, validators = [validate_hostname], error_messages={'unique': 'The entered hostname already exists.'})
+    hostname = models.CharField(max_length = 100, unique = True, validators = [validate_hostname],
+                                error_messages = {'unique': 'The entered hostname already exists.'})
     description = models.CharField(max_length=400)
     output_directory = models.CharField('Rules output directory', max_length=400)
     yaml_file = models.CharField('Suricata configuration file', max_length=400)
