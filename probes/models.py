@@ -23,10 +23,12 @@ import os
 
 from rules.models import Ruleset
 
-
+# Return the last (e.g.) 10 most recently created hostnames in reverse order.
 def get_probe_hostnames(limit=10):
+    probes = Probes.objects.all().order_by('-created_date')[:limit]
+    if probes is not None:
+        return list(reversed([rec.hostname for rec in probes]))
     return None
-
 
 def validate_hostname(value):
     if ' ' in value:

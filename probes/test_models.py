@@ -53,3 +53,34 @@ class ModelTestCase(TransactionTestCase):
 
         probe1.save()
         self.assertRaises(IntegrityError, probe2.save)
+
+    def test_should_return_most_recently_created_hostnames_reverse_sorted_by_creation_date(self):
+        probe1 = Probes(hostname='hostA',
+                        description='descA',
+                        output_directory='dirA',
+                        yaml_file='filenameA',
+                        created_date=timezone.now(),
+                        updated_date=timezone.now())
+        probe1.save()
+
+        probe2 = Probes(hostname='hostB',
+                        description='descB',
+                        output_directory='dirB',
+                        yaml_file='filenameB',
+                        created_date=timezone.now(),
+                        updated_date=timezone.now())
+        probe2.save()
+
+        probe3 = Probes(hostname='hostC',
+                        description='descC',
+                        output_directory='dirC',
+                        yaml_file='filenameC',
+                        created_date=timezone.now(),
+                        updated_date=timezone.now())
+        probe3.save()
+
+        ruleset_middleware = 'probes'
+        Probe = __import__(ruleset_middleware)
+        self.assertEqual(Probe.models.get_probe_hostnames(), ['hostA', 'hostB', 'hostC'])
+        self.assertEqual(Probe.models.get_probe_hostnames(limit=2), ['hostB', 'hostC'])
+        self.assertEqual(Probe.models.get_probe_hostnames(limit=1), ['hostC'])
