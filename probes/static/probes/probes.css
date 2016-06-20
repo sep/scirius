@@ -69,14 +69,3 @@
     background: linear-gradient(#ddd, #fff);
     border-bottom-color: #ddd;
 }
-
-.animate-spin {
-    animation: spin 1s infinite ease;
-    margin: 4px 6px 4px 0;
-    transform-origin: 50% 44%;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(180deg); }
-}
