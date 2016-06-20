@@ -78,9 +78,17 @@ class WithProbeTestCase(TestCase):
         self.assertEqual(response.context['error'], None)
         self.assertEqual(response.context['error_heading'], None)
 
-    def test_post_should_delete_probe(self):
+    def test_should_delete_correct_probe_via_post(self):
+        probe2 = Probes.objects.create(hostname='probe2',
+                                       description='the probe description 2',
+                                       output_directory='dir2',
+                                       yaml_file='filename2',
+                                       created_date='2016-02-01T12:23:34.000Z',
+                                       updated_date='2016-02-02T12:23:34.000Z')
+
         self.client.post('/probes/%i/delete' % self.probe.id)
-        self.assertEqual(len(Probes.objects.all()), 0)
+        self.assertEqual(len(Probes.objects.all()), 1)
+        self.assertEqual(Probes.objects.get(id=probe2.id).hostname, 'probe2')
 
     def test_deleting_an_invalid_id_should_set_error_message(self):
         invalid_id = 9999999
@@ -90,12 +98,12 @@ class WithProbeTestCase(TestCase):
         self.assertEqual(messages[0].extra_tags, 'alert-danger')
         self.assertEqual(str(messages[0]), 'The selected probe was not found.')
 
-    def test_get_should_not_delete_probe(self):
+    def test_should_not_delete_probe_via_get(self):
         self.assertEqual(len(Probes.objects.all()), 1)
         self.client.get('/probes/%i/delete' % self.probe.id)
         self.assertEqual(len(Probes.objects.all()), 1)
 
-    def test_edit_should_change_probe_data(self):
+    def test_should_edit_probe_data_via_post(self):
         valid_form_data = {
             'description': 'abc',
             'hostname': 'newhostname',
@@ -104,13 +112,13 @@ class WithProbeTestCase(TestCase):
         }
         response = self.client.post('/probes/%i/edit' % self.probe.id, valid_form_data)
         self.assertEqual(response.status_code, 302)
-        probe = Probes.objects.get(id = self.probe.id)
+        probe = Probes.objects.get(id=self.probe.id)
         self.assertEqual(probe.description, 'abc')
         self.assertEqual(probe.hostname, 'newhostname')
         self.assertEqual(probe.output_directory, '/dir1/dir2')
         self.assertEqual(probe.yaml_file, 'dummy.txt')
 
-    def test_get_should_not_edit_probe_data(self):
+    def test_should_not_edit_probe_data_via_get(self):
         valid_form_data = {
             'description': 'abc',
             'hostname': 'newhostname',
@@ -119,6 +127,8 @@ class WithProbeTestCase(TestCase):
         }
         response = self.client.get('/probes/%i/edit' % self.probe.id, valid_form_data)
         self.assertEqual(response.status_code, 302)
+        probe = Probes.objects.get(id=self.probe.id)
+        self.assertEqual(probe.hostname, 'probe1')
 
     def test_editing_an_invalid_id_should_set_error_message(self):
         invalid_id = 9999999
@@ -145,7 +155,7 @@ class WithProbeTestCase(TestCase):
         self.assertEqual(probe.yaml_file, 'filename')
         self.assertEqual(response.context['error'], {'yaml_file': [u'This field is required.']})
 
-    def test_get_should_not_add_a_probe(self):
+    def test_should_not_add_a_probe_via_get(self):
         valid_form_data = {
             'description': 'abc',
             'hostname': 'newhostname',
@@ -157,7 +167,7 @@ class WithProbeTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(Probes.objects.all()), 1)
 
-    def test_add_with_valid_form_should_add_a_probe(self):
+    def test_should_add_a_probe_via_post(self):
         valid_form_data = {
             'description': 'abc',
             'hostname': 'newhostname',
@@ -168,13 +178,13 @@ class WithProbeTestCase(TestCase):
         response = self.client.post('/probes/add', valid_form_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(Probes.objects.all()), 2)
-        probe = Probes.objects.get(id = response.url[-2:-1])
+        probe = Probes.objects.get(id=response.url[-2:-1])
         self.assertEqual(probe.description, 'abc')
         self.assertEqual(probe.hostname, 'newhostname')
         self.assertEqual(probe.output_directory, '/dir1/dir2')
         self.assertEqual(probe.yaml_file, 'dummy.txt')
 
-    def test_add_with_incomplete_form_should_not_add_probe(self):
+    def test_should_not_add_a_probe_with_incomplete_form_data(self):
         incomplete_form_data = {
             # 'description' field excluded
             'hostname': 'newhostname',
