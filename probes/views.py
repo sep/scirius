@@ -27,6 +27,7 @@ from probes.models import Probes
 from probes.forms import ProbeForm
 from rules.views import complete_context
 
+
 def process_messages(values):
     for message in values:
         if message.level == messages.ERROR:
@@ -39,6 +40,7 @@ def process_messages(values):
             message.extra_tags = 'alert-info'
     return values
 
+
 def get_context(request):
     return {
         'probes': Probes.objects.all(),
@@ -46,24 +48,26 @@ def get_context(request):
         'messages': process_messages(get_messages(request))
     }
 
-def index(request, error = None, error_heading = None):
+
+def index(request, error=None, error_heading=None):
     context = get_context(request)
     context['error'] = error
     context['error_heading'] = error_heading
     return scirius_render(request, 'probes/index.html', context)
 
-def probe_index(request, probe_id, error = None, error_heading = None):
+
+def probe_index(request, probe_id, error=None, error_heading=None):
     context = get_context(request)
     context['current_id'] = int(probe_id)
 
     try:
-        probe = context['probes'].get(id = probe_id)
+        probe = context['probes'].get(id=probe_id)
     except Probes.DoesNotExist:
         messages.error(request, 'The selected probe could not be loaded.')
         return redirect(index)
 
     context['probe'] = probe
-    context['editProbeForm'] = ProbeForm(instance = probe)
+    context['editProbeForm'] = ProbeForm(instance=probe)
     context['error'] = error
     context['error_heading'] = error_heading
 
@@ -79,35 +83,58 @@ def probe_index(request, probe_id, error = None, error_heading = None):
 
     return scirius_render(request, 'probes/probe.html', context)
 
+
+def build_probe(request, probe_id):
+    if request.method != 'POST' or not request.user.is_staff:
+        return redirect(index)
+
+    try:
+        probe = Probes.objects.get(id=probe_id)
+    except Probes.DoesNotExist:
+        messages.error(request, 'The selected probe was not found.')
+        return redirect(index)
+
+    try:
+        probe.build_rules()
+        messages.success(request, 'Rules have been built.')
+    except Exception, error:
+        messages.error(request, 'Failed to build rules: ' + str(error))
+
+    return redirect('probes_probe', probe_id=probe_id)
+
+
 def delete_probe(request, probe_id):
     if request.method != 'POST' or not request.user.is_staff:
         return redirect(index)
 
     try:
-        Probes.objects.get(id = probe_id).delete()
+        Probes.objects.get(id=probe_id).delete()
     except Probes.DoesNotExist:
         messages.error(request, 'The selected probe was not found.')
 
     return redirect(index)
+
 
 def edit_probe(request, probe_id):
     if request.method != 'POST' or not request.user.is_staff:
         return redirect(index)
 
     try:
-        probe = Probes.objects.get(id = probe_id)
+        probe = Probes.objects.get(id=probe_id)
     except Probes.DoesNotExist:
         messages.error(request, 'The selected probe was not found.')
         return redirect(index)
 
-    form = ProbeForm(request.POST, instance = probe)
+    form = ProbeForm(request.POST, instance=probe)
     if form.is_valid():
         form.save()
         messages.success(request, 'Your probe changes have been saved.')
     else:
-        return probe_index(request, probe_id, form.errors, 'This probe could not be modified because of the following errors:')
+        return probe_index(request, probe_id, form.errors,
+                           'This probe could not be modified because of the following errors:')
 
-    return redirect('probes_probe', probe_id = probe_id)
+    return redirect('probes_probe', probe_id=probe_id)
+
 
 def add_probe(request):
     if request.method != 'POST' or not request.user.is_staff:
@@ -116,26 +143,27 @@ def add_probe(request):
     form = ProbeForm(request.POST)
     if form.is_valid():
         try:
-            probe = Probes.objects.create(hostname = form.cleaned_data['hostname'],
-                                                description = form.cleaned_data['description'],
-                                                output_directory = form.cleaned_data['output_directory'],
-                                                created_date = timezone.now(),
-                                                updated_date = timezone.now(),
-                                                ruleset = form.cleaned_data['ruleset'],
-                                                yaml_file = form.cleaned_data['yaml_file'],
-                                               )
-            return redirect('probes_probe', probe_id = probe.id)
+            probe = Probes.objects.create(hostname=form.cleaned_data['hostname'],
+                                          description=form.cleaned_data['description'],
+                                          output_directory=form.cleaned_data['output_directory'],
+                                          created_date=timezone.now(),
+                                          updated_date=timezone.now(),
+                                          ruleset=form.cleaned_data['ruleset'],
+                                          yaml_file=form.cleaned_data['yaml_file'],
+                                          )
+            return redirect('probes_probe', probe_id=probe.id)
         except IntegrityError, error:
             return index(request, error)
     else:
         return index(request, form.errors, 'The probe could not be added because of the following errors:')
+
 
 def update_ruleset(request, probe_id):
     if request.method != 'POST' or not request.user.is_staff:
         return redirect(index)
 
     try:
-        probe = Probes.objects.get(id = probe_id)
+        probe = Probes.objects.get(id=probe_id)
     except Probes.DoesNotExist:
         messages.error(request, 'The selected probe could not be loaded.')
         return redirect(index)

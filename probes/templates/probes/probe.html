@@ -37,6 +37,19 @@
 
 {% if request.user.is_staff %}
 <script type="text/javascript">
+    function buildProbe() {
+        $('#buildProbeForm').submit();
+    }
+
+    function confirmProbeBuild() {
+        showConfirmationDialog('Build probe rules for {{ probe.hostname }}?',
+            'Are you sure you want to build the probe rules?',
+            'Confirm',
+            'Cancel',
+            'btn-primary',
+            buildProbe);
+    }
+
     function deleteProbe() {
         $('#deleteProbeForm').submit();
     }
@@ -110,10 +123,14 @@
             </div>
         </div>
 
-        <a class="btn btn-info">
+        <a class="btn btn-info {% if not probe.ruleset %}disabled{% endif %}" onclick="confirmProbeBuild(); return false;">
             <span class="glyphicon glyphicon-floppy-disk"></span>
             Build rules
         </a>
+        <form action="{% url 'probes_build' probe.id %}" method="post" id="buildProbeForm">
+            {% csrf_token %}
+        </form>
+
         <a class="btn btn-danger" onclick="confirmProbeDelete(); return false;">
             <span class="glyphicon glyphicon-trash"></span>
             Delete probe
