@@ -22,6 +22,9 @@ from django.test import TestCase
 from django.utils import timezone
 
 from probes.models import Probes
+from rules.models import Ruleset
+
+from mock import Mock, MagicMock, patch
 
 
 class NoProbesTestCase(TestCase):
@@ -55,6 +58,7 @@ class WithProbeTestCase(TestCase):
                                            yaml_file='filename',
                                            created_date='2016-01-01T12:23:34.000Z',
                                            updated_date='2016-01-02T12:23:34.000Z')
+
 
     def tearDown(self):
         User.objects.all().delete()
@@ -102,6 +106,43 @@ class WithProbeTestCase(TestCase):
         self.assertEqual(len(Probes.objects.all()), 1)
         self.client.get('/probes/%i/delete' % self.probe.id)
         self.assertEqual(len(Probes.objects.all()), 1)
+
+    def test_should_build_rules(self):
+        mock_ruleset = Mock(spec=Ruleset)
+        mock_ruleset.id = 999999
+        mock_ruleset.name = 'rulesetname'
+        mock_ruleset._state = Mock()
+        mock_ruleset.generate = Mock(return_value=[])
+        mock_ruleset.export_files = Mock()
+
+        dir_path = '/dir1/dir2'
+
+        probe = Probes()
+        probe.hostname = 'hostname'
+        probe.description = 'hostname_desc'
+        probe.output_directory = dir_path
+        probe.yaml_file = 'dummy.txt'
+        probe.created_date = timezone.now()
+        probe.updated_date = timezone.now()
+        probe.ruleset = mock_ruleset
+
+        mock_file = MagicMock()
+        mock_open = MagicMock(return_value=mock_file)
+        with patch('probes.models.open', mock_open):
+            probe.build_rules()
+
+        mock_open.assert_called_with(dir_path +'/scirius.rules', 'w')
+        self.assertTrue(mock_file.write.called, "Failed to call write().")
+        self.assertTrue(mock_file.close.called, "Failed to call close().")
+        self.assertTrue(mock_ruleset.generate.called, "Failed to call generate().")
+        self.assertTrue(mock_ruleset.export_files.called, "Failed to call export_files().")
+        mock_ruleset.export_files.assert_called_with(dir_path)
+
+    def test_should_not_build_rules_via_get(self):
+        response = self.client.get('/probes/%i/build' % self.probe.id)
+        self.assertEqual(response.status_code, 302)
+        probe = Probes.objects.get(id=self.probe.id)
+        self.assertEqual(probe.hostname, 'probe1')
 
     def test_should_edit_probe_data_via_post(self):
         valid_form_data = {
