@@ -59,7 +59,7 @@ class ModelTestCase(TransactionTestCase):
                         description='descA',
                         output_directory='dirA',
                         yaml_file='filenameA',
-                        created_date=timezone.now(),
+                        created_date='2016-01-01T00:00:00.000Z',
                         updated_date=timezone.now())
         probe1.save()
 
@@ -67,7 +67,7 @@ class ModelTestCase(TransactionTestCase):
                         description='descB',
                         output_directory='dirB',
                         yaml_file='filenameB',
-                        created_date=timezone.now(),
+                        created_date='2016-01-01T00:00:05.000Z',
                         updated_date=timezone.now())
         probe2.save()
 
@@ -75,12 +75,12 @@ class ModelTestCase(TransactionTestCase):
                         description='descC',
                         output_directory='dirC',
                         yaml_file='filenameC',
-                        created_date=timezone.now(),
+                        created_date='2016-01-01T00:00:02.000Z',
                         updated_date=timezone.now())
         probe3.save()
 
         ruleset_middleware = 'probes'
         Probe = __import__(ruleset_middleware)
-        self.assertEqual(Probe.models.get_probe_hostnames(), ['hostA', 'hostB', 'hostC'])
-        self.assertEqual(Probe.models.get_probe_hostnames(limit=2), ['hostB', 'hostC'])
-        self.assertEqual(Probe.models.get_probe_hostnames(limit=1), ['hostC'])
+        self.assertEqual(Probe.models.get_probe_hostnames(), ['hostA', 'hostC', 'hostB'])
+        self.assertEqual(Probe.models.get_probe_hostnames(limit=2), ['hostC', 'hostB'])
+        self.assertEqual(Probe.models.get_probe_hostnames(limit=1), ['hostB'])
