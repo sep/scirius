@@ -20,11 +20,16 @@ from django.core.urlresolvers import reverse
 from django.test import Client
 from django.test import TestCase
 from django.utils import timezone
+from unittest import skipIf
 
 from probes.models import Probes
 from rules.models import Ruleset
 
-from mock import Mock, MagicMock, patch
+try:
+    from mock import Mock, MagicMock, patch
+    no_mock_support = False
+except ImportError:
+    no_mock_support = True
 
 
 class NoProbesTestCase(TestCase):
@@ -107,6 +112,7 @@ class WithProbeTestCase(TestCase):
         self.client.get('/probes/%i/delete' % self.probe.id)
         self.assertEqual(len(Probes.objects.all()), 1)
 
+    @skipIf(no_mock_support, "Mock support not found; please run 'pip install mock'.")
     def test_should_build_rules(self):
         mock_ruleset = Mock(spec=Ruleset)
         mock_ruleset.id = 999999
