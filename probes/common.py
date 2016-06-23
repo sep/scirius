@@ -26,6 +26,7 @@ import re
 
 from django.conf import settings
 
+
 class Info():
     def status(self):
         suri_running = False
@@ -37,3 +38,10 @@ class Info():
     def memory(self):
         return psutil.virtual_memory()
 
+
+class Test():
+    def rule(self, rule_buffer, config_buffer=None, related_files={}):
+        return {'status': True}
+
+    def rules(self, rule_buffer, config_buffer=None, related_files={}):
+        return {'status': True}
