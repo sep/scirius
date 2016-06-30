@@ -1,0 +1,153 @@
+<div role="tabpanel">
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#rules" aria-controls="rules" role="tab" data-toggle="tab">Rules
+            activity</a></li>
+
+        {% if suricata_stats %}
+        <li role="presentation"><a href="#stats" aria-controls="stats" role="tab" data-toggle="tab">Capture stats</a>
+        </li>
+        <li role="presentation"><a href="#memory" aria-controls="memory" role="tab" data-toggle="tab">Memory usage</a>
+        </li>
+        <li role="presentation"><a href="#indicators" aria-controls="indicators" role="tab" data-toggle="tab">Problem
+            indicators</a></li>
+        {% endif %}
+    </ul>
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane fade in active" id="rules">
+            <div class="container-fluid">
+                <div class="row">
+                    <div id="filter"></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        {% include "probes/inc_es_entry.html" with entry_title="Rules activity" entry_id="rules_table" entry_skip_svg=True %}
+                    </div>
+                    <div class="col-md-6">
+                        {% include "probes/inc_es_entry.html" with entry_title="Alerts activity" entry_special=True entry_id="timeline" entry_extra_id="circles" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if suricata_stats %}
+        <div role="tabpanel" class="tab-pane fade" id="stats">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        {% include "probes/inc_es_entry.html" with entry_title="Kernel captured packets" entry_id="suri_packet" %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        {% include "probes/inc_es_entry.html" with entry_title="Kernel dropped packets" entry_id="suri_drop" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div role="tabpanel" class="tab-pane fade" id="indicators">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6">
+                        {% include "probes/inc_es_entry.html" with entry_title="Flow emergency mode" entry_id="flow_emergency" %}
+                    </div>
+                    <div class="col-md-6">
+                        {% include "probes/inc_es_entry.html" with entry_title="TCP reassembly gaps" entry_id="tcp_gaps" %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        {% include "probes/inc_es_entry.html" with entry_title="Decoder invalid" entry_id="decoder_invalid" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div role="tabpanel" class="tab-pane fade" id="memory">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6">
+                        {% include "probes/inc_es_entry.html" with entry_title="TCP memory usage" entry_id="tcp_memuse" %}
+                    </div>
+                    <div class="col-md-6">
+                        {% include "probes/inc_es_entry.html" with entry_title="TCP reassembly memory usage" entry_id="tcp_reassembly_memuse" %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        {% include "probes/inc_es_entry.html" with entry_title="DNS memory usage" entry_id="dns_memuse" %}
+                    </div>
+                    <div class="col-md-6">
+                        {% include "probes/inc_es_entry.html" with entry_title="HTTP memory usage" entry_id="http_memuse" %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        {% include "probes/inc_es_entry.html" with entry_title="Flow memory usage" entry_id="flow_memuse" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script type="text/javascript">
+function differentiate_suppressed() {
+    var arr = [{{ suppressed }}];
+    $(".sid").each(function() {
+        if (jQuery.inArray(parseInt($( this ).text(), 10), arr) != -1)
+            $( this ).addClass("suppressed")
+    })
+}
+
+$(function () {
+    draw_timeline({{ from_date }}, [ '{{ probe.hostname }}'], null);
+    load_rules({{ from_date }},  [ '{{ probe.hostname }}'], null);
+
+    {{ draw_func }}({{ from_date }}, [{% autoescape off %} "{{ probe.hostname }}" {% endautoescape %}], null,
+      function() {
+        $('{{ draw_elt }}').mouseover(function(){
+            var d = this.__data__;
+            if (d.children == undefined) {
+                $( "#rules_table a:contains('" + d.key + "')" ).parent().parent().addClass('overed');
+            }
+        });
+        $('{{ draw_elt }}').mouseout(function(){
+            var d = this.__data__;
+            if (d.children == undefined) {
+                $( "#rules_table a:contains('" + d.key + "')" ).parent().parent().removeClass('overed');
+            }
+        });
+      }
+    );
+
+    differentiate_suppressed();
+});
+
+$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+    if (String(e.target).match('#stats')) {
+        draw_stats_timeline({{ from_date }}, 'stats.capture.kernel_packets', '#suri_packet', 1, [ '{{ probe.hostname }}' ]);
+        draw_stats_timeline({{ from_date }}, 'stats.capture.kernel_drops', '#suri_drop', 1, [ '{{ probe.hostname }}' ]);
+    }
+    if (String(e.target).match('#rules')) {
+        draw_timeline({{ from_date }}, [ '{{ probe.hostname }}'], null);
+    }
+    if (String(e.target).match('#indicators')) {
+        draw_stats_timeline({{ from_date }}, 'stats.flow.emerg_mode_entered', '#flow_emergency', 0, [ '{{ probe.hostname }} ']);
+        draw_stats_timeline({{ from_date }}, 'stats.tcp.reassembly_gap', '#tcp_gaps', 0, [ '{{ probe.hostname }}' ]);
+        draw_stats_timeline({{ from_date }}, 'stats.decoder.invalid', '#decoder_invalid', 0, [ '{{ probe.hostname }}' ]);
+    }
+    if (String(e.target).match('#memory')) {
+        draw_stats_timeline({{ from_date }}, 'stats.flow.memuse', '#flow_memuse', 0, [ '{{ probe.hostname }}' ]);
+        draw_stats_timeline({{ from_date }}, 'stats.tcp.memuse', '#tcp_memuse', 0, [ '{{ probe.hostname }}' ]);
+        draw_stats_timeline({{ from_date }}, 'stats.tcp.reassembly_memuse', '#tcp_reassembly_memuse', 0, [ '{{ probe.hostname }}' ]);
+        draw_stats_timeline({{ from_date }}, 'stats.http.memuse', '#http_memuse', 0, [ '{{ probe.hostname }}' ]);
+        draw_stats_timeline({{ from_date }}, 'stats.dns.memuse', '#dns_memuse', 0, [ '{{ probe.hostname }}' ]);
+    }
+
+    e.target.blur();
+});
+</script>

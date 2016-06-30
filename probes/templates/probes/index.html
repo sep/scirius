@@ -1,0 +1,6 @@
+{% extends "probes/probes_base.html" %}
+{% load staticfiles %}
+
+{% block probecontent %}
+<p>You currently have {{ probes|length }} probe{{ probes|length|pluralize }} defined.</p>
+{% endblock %}

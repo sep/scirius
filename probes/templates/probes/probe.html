@@ -1,0 +1,151 @@
+{% extends "probes/probes_base.html" %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+{% block probecontent %}
+
+{% if elasticsearch %}
+{% include "probes/inc_elasticsearch.html" %}
+{% else %}
+<p>Elasticsearch is disabled.</p>
+{% endif %}
+
+<div class="modal fade" id="editProbeModal" tabindex="-1" role="dialog" aria-labelledby="editProbeModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="editProbeModalLabel">Edit probe</h4>
+            </div>
+            <form action="{% url 'probes_edit' probe.id %}" method="post">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    {% bootstrap_form editProbeForm %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+
+{% if request.user.is_staff %}
+<script type="text/javascript">
+    function buildProbe() {
+        $('#buildProbeForm').submit();
+    }
+
+    function confirmProbeBuild() {
+        showConfirmationDialog('Build probe rules for {{ probe.hostname }}?',
+            'Are you sure you want to build the probe rules?',
+            'Confirm',
+            'Cancel',
+            'btn-primary',
+            buildProbe);
+    }
+
+    function deleteProbe() {
+        $('#deleteProbeForm').submit();
+    }
+
+    function confirmProbeDelete() {
+        showConfirmationDialog('Delete probe {{ probe.hostname }}?',
+            'Are you sure you want to delete this probe? This action cannot be undone.',
+            'Delete',
+            'Cancel',
+            'btn-danger',
+            deleteProbe);
+    }
+
+    function updateProbeRuleset() {
+        $('#confirmationModal').on('hidden.bs.modal', function () {
+            $('#probeUpdatingModal').modal('show');
+        });
+
+        $('#updateProbeForm').submit();
+    }
+
+    function confirmProbeUpdate() {
+        {% if not probe.ruleset %} return; {% endif %}
+
+        showConfirmationDialog('Update ruleset {{ probe.ruleset }}?',
+            'Are you sure you want to update the current ruleset and its sources?',
+            'Update',
+            'Cancel',
+            'btn-primary',
+            updateProbeRuleset);
+    }
+</script>
+{% endif %}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h2 class="panel-title">Probe {{ probe.hostname }}</h2>
+        <p class="panel-subtitle">{{ probe.description }}</p>
+    </div>
+    <div class="panel-body">
+        <p>Created on {{ probe.created_date }}</p>
+        <p>Last modified on {{ probe.updated_date }}</p>
+        <p>Current ruleset: {{ probe.ruleset }}</p>
+
+        {% if request.user.is_staff %}
+        <a class="btn btn-default" data-toggle="modal" data-target="#editProbeModal">
+            <span class="glyphicon glyphicon-pencil"></span>
+            Edit probe
+        </a>
+
+        <hr />
+
+        <a class="btn btn-success {% if not probe.ruleset %}disabled{% endif %}" onclick="confirmProbeUpdate(); return false;">
+            <span class="glyphicon glyphicon-refresh"></span>
+            Update ruleset
+        </a>
+        <form action="{% url 'probes_update_ruleset' probe.id %}" method="post" id="updateProbeForm">
+            {% csrf_token %}
+        </form>
+        <div class="modal fade" id="probeUpdatingModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="probeUpdatingModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="probeUpdatingModalLabel">Updating...</h4>
+                    </div>
+                    <div class="modal-body">
+                        Please wait while the ruleset and its sources are updated...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a class="btn btn-info {% if not probe.ruleset %}disabled{% endif %}" onclick="confirmProbeBuild(); return false;">
+            <span class="glyphicon glyphicon-floppy-disk"></span>
+            Build rules
+        </a>
+        <form action="{% url 'probes_build' probe.id %}" method="post" id="buildProbeForm">
+            {% csrf_token %}
+        </form>
+
+        <a class="btn btn-danger" onclick="confirmProbeDelete(); return false;">
+            <span class="glyphicon glyphicon-trash"></span>
+            Delete probe
+        </a>
+        <form action="{% url 'probes_delete' probe.id %}" method="post" id="deleteProbeForm">
+            {% csrf_token %}
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+{% if request.user.is_staff %}
+<a class="btn btn-primary" data-toggle="modal" data-target="#addProbeModal">
+    <span class="glyphicon glyphicon-plus"></span>
+    Add probe
+</a>
+{% endif %}
+
+{% endblock %}
