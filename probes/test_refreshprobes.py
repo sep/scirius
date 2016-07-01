@@ -18,13 +18,14 @@ along with Scirius.  If not, see <http://www.gnu.org/licenses/>.
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
-from django.utils.six import StringIO
-from probes.models import Probes
 
 
-class BadSyntaxTestCase(TestCase):
+class SimpleTestCase(TestCase):
     def test_should_require_update_or_build_action(self):
-        out = StringIO()
-        err = StringIO()
         with self.assertRaisesRegexp(CommandError, '''You\ must\ specify\ \-u\ and\/or\ \-b'''):
-            call_command('refreshprobes', 'someprobe', stdout=out, stderr=err)
+            call_command('refreshprobes', 'someprobe')
+
+    def test_should_display_missing_probe_error_when_referencing_unknown_probe(self):
+        with self.assertRaisesRegexp(CommandError,
+                                     '''The\ following\ specified\ probes\ are\ invalid\:\ p2, p1'''):
+            call_command('refreshprobes', '-u', 'p1', 'p2')
