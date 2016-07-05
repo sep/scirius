@@ -52,7 +52,7 @@ class Command(BaseCommand):
                 try:
                     probe.ruleset.update()
                 except Exception, e:
-                    self.stdout.write('Ruleset for probe "%s" could not be updated' % probe.hostname)
+                    self.stderr.write('Ruleset for probe "%s" could not be updated' % probe.hostname)
                     raise e
             self.stdout.write('Update complete')
 
@@ -67,6 +67,6 @@ class Command(BaseCommand):
                 try:
                     probe.build_rules()
                 except Exception, e:
-                    self.stdout.write('Build for probe "%s" failed' % probe.hostname)
+                    self.stderr.write('Build for probe "%s" failed' % probe.hostname)
                     raise e
             self.stdout.write('Build complete')

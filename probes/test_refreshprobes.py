@@ -120,3 +120,21 @@ class AdvancedTestCase(TestCase):
             call_command('refreshprobes', '-bu', 'probe1', stdout=out, stderr=err)
 
         parent_mock.assert_has_calls([call.update(), call.build()])
+
+    def test_should_raise_when_update_raises(self):
+        err = StringIO()
+        update_err_mock = Mock()
+        update_err_mock.side_effect = Exception
+        with self.assertRaises(Exception):
+            with patch('rules.models.Ruleset.update', update_err_mock):
+                call_command('refreshprobes', '-u', 'probe1', stderr=err)
+        self.assertIn('Ruleset for probe "probe1" could not be updated', err.getvalue())
+
+    def test_should_raise_when_build_rules_raises(self):
+        err = StringIO()
+        build_err_mock = Mock()
+        build_err_mock.side_effect = Exception
+        with self.assertRaises(Exception):
+            with patch('probes.models.Probes.build_rules', build_err_mock):
+                call_command('refreshprobes', '-b', 'probe1', stderr=err)
+        self.assertIn('Build for probe "probe1" failed', err.getvalue())
