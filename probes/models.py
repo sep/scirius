@@ -44,6 +44,7 @@ class Probes(models.Model):
     created_date = models.DateTimeField('Date created')
     updated_date = models.DateTimeField('Date updated', blank=True)
     ruleset = models.ForeignKey(Ruleset, blank=True, null=True, on_delete=models.SET_NULL)
+    elasticsearch_node = models.CharField('Elasticsearch node (optional)', max_length=100, blank=True, null=True, validators=[validate_hostname])
 
     def __unicode__(self):
         return self.hostname
